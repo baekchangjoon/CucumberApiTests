@@ -15,9 +15,14 @@ public class StepDefinitions {
 
     @Given("I have an endpoint {string}")
     public void i_have_an_endpoint(String endpoint) {
+        System.out.format("Thread ID - %2d - %s from %s feature file.\n",
+                Thread.currentThread().getId(), endpoint, this.getClass().getName());
         this.apiEndpoint = endpoint;
         // 실제 테스트 시나리오에서는 여기서 API URL 설정 로직 등을 구성할 수 있음
         System.out.println("Endpoint 설정: " + apiEndpoint);
+        for(int i = 0 ; i < 999999999 ; i++) {
+            i++;
+        }
     }
 
     @When("I call the API with param {string}")
