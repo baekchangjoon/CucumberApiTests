@@ -10,7 +10,7 @@ import picocli.CommandLine.Option;
         version = "CucumberApiTests 0.1",
         subcommands = {
                 HtmlParser.class,
-                WiremockStarter.class,
+                WireMockStarter.class,
                 MemoryDBStarter.class,
                 CucumberStarter.class
         }

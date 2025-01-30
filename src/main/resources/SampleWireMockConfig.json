@@ -1,0 +1,14 @@
+[
+  {
+    "serviceName": "serviceA",
+    "port": 8081
+  },
+  {
+    "serviceName": "serviceB",
+    "port": 8082
+  },
+  {
+    "serviceName": "serviceC",
+    "port": 8083
+  }
+]
