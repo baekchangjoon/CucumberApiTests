@@ -35,7 +35,7 @@ public class H2StopCommand implements Callable<Integer> {
 
         // 종료 후 pid 파일 삭제
         pidFile.delete();
-        System.out.println("[Parent] All children stopped. pid file removed.");
+        System.out.println("[Parent] All children stopped. pid file removed." + pidFilePath);
 
         return 0;
     }

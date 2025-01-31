@@ -52,6 +52,9 @@ public class H2StartCommandTest {
         List<String> lines = Files.readAllLines(actualPidFile.toPath());
         // defaultValue => 4개 포트
         assertEquals(4, lines.size());
+
+        // after
+        actualPidFile.delete();
     }
 
     @Test
@@ -83,6 +86,9 @@ public class H2StartCommandTest {
         assertEquals(4, lines.size());
         assertEquals("12345", lines.get(0));
         assertEquals("12345", lines.get(1));
+
+        // after
+        actualPidFile.delete();
     }
 }
 
