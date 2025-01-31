@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 
 @Command(name = "stop",
         description = "Stop all H2 child processes using the pid file.")
-class H2StopCommand implements Callable<Integer> {
+public class H2StopCommand implements Callable<Integer> {
 
     @Option(names = {"--pid-file"}, defaultValue = "h2db-child.pid")
     private String pidFilePath;
@@ -40,7 +40,7 @@ class H2StopCommand implements Callable<Integer> {
         return 0;
     }
 
-    private void stopProcess(long pid) {
+    protected void stopProcess(long pid) {
         // Java 9+에서 지원
         ProcessHandle.of(pid).ifPresentOrElse(ph -> {
             System.out.println("[Parent] Destroying PID=" + pid);

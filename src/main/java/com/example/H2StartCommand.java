@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 
 @Command(name = "start",
         description = "Start multiple H2 servers (child processes) for given ports and exit.")
-class H2StartCommand implements Callable<Integer> {
+public class H2StartCommand implements Callable<Integer> {
 
     @Option(names = {"-p", "--ports"},
             description = "Comma-separated port numbers (ex: 33306,33307).",
@@ -65,7 +65,7 @@ class H2StartCommand implements Callable<Integer> {
         return 0;
     }
 
-    private long startOneChild(String port, String dbUser, String dbPass, String initSql) throws IOException {
+    protected long startOneChild(String port, String dbUser, String dbPass, String initSql) throws IOException {
         // 자바 실행 경로
         String javaHome = System.getProperty("java.home");
         String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
@@ -109,5 +109,9 @@ class H2StartCommand implements Callable<Integer> {
             fw.write(String.valueOf(pid));
             fw.write("\n");
         }
+    }
+
+    public String getPidFilePath() {
+        return pidFilePath;
     }
 }
