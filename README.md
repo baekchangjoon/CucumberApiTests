@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/baekchangjoon/CucumberApiTests/graph/badge.svg?token=23K2OUH1PQ)](https://codecov.io/gh/baekchangjoon/CucumberApiTests)
 
 # Cucumber API Tests
 

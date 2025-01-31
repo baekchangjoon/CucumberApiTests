@@ -16,7 +16,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,5 +26,26 @@ jobs:
         java-version: '11'
         distribution: 'corretto'
         cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+
+    # Cache Maven dependencies to speed up the build process
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-maven
+
+    # Install project dependencies and run tests with coverage
+    - name: Build and test with Maven
+      run: mvn clean verify
+
+    # Upload coverage report to Codecov
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: baekchangjoon/CucumberApiTests
+        files: '**/target/site/jacoco/*.xml'
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
