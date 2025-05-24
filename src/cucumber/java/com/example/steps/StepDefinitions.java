@@ -1,51 +1,85 @@
 package com.example.steps;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
-import io.cucumber.java.en.Then;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import static org.junit.Assert.assertEquals;
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 public class StepDefinitions {
 
     private String apiEndpoint;
     private String param;
+    private String method;
     private int actualStatusCode;
     private int expectedStatusCode;
+    private final CloseableHttpClient httpClient;
+
+    public StepDefinitions() {
+        this.httpClient = HttpClients.createDefault();
+    }
 
     @Given("I have an endpoint {string}")
     public void i_have_an_endpoint(String endpoint) {
-        System.out.format("Thread ID - %2d - %s from %s feature file.\n",
-                Thread.currentThread().getId(), endpoint, this.getClass().getName());
         this.apiEndpoint = endpoint;
-        // 실제 테스트 시나리오에서는 여기서 API URL 설정 로직 등을 구성할 수 있음
         System.out.println("Endpoint 설정: " + apiEndpoint);
-        for(int i = 0 ; i < 999999999 ; i++) {
-            i++;
-        }
     }
 
-    @When("I call the API with param {string}")
-    public void i_call_the_api_with_param(String param) {
+    @When("I call the API with param {string} using {string}")
+    public void i_call_the_api_with_param_using_method(String param, String method) {
         this.param = param;
-        // 실제 로직 예시: HTTP Client로 apiEndpoint에 요청 보내기
-        // 요청 시 param을 쿼리 파라미터로 넘기는 등의 과정
-        // 응답 값에서 status code를 추출
-        // 여기서는 예시로만 status code를 임의로 설정
-        System.out.println("Param 설정: " + param);
+        this.method = method;
+        System.out.println("Param 설정: " + this.param);
+        System.out.println("Method 설정: " + this.method);
+        
+        try {
+            HttpRequestBase request;
+            switch (this.method.toUpperCase()) {
+                case "POST":
+                    HttpPost postRequest = new HttpPost(apiEndpoint);
+                    postRequest.setEntity(new StringEntity(this.param));
+                    request = postRequest;
+                    break;
+                case "PUT":
+                    HttpPut putRequest = new HttpPut(apiEndpoint);
+                    putRequest.setEntity(new StringEntity(this.param));
+                    request = putRequest;
+                    break;
+                case "DELETE":
+                    request = new HttpDelete(apiEndpoint);
+                    break;
+                case "GET":
+                default:
+                    String encodedParam = URLEncoder.encode(this.param, StandardCharsets.UTF_8.toString());
+                    String delimiter = apiEndpoint.contains("?") ? "&" : "?";
+                    String getUrl = apiEndpoint + delimiter + "param=" + encodedParam;
+                    request = new HttpGet(getUrl);
+                    break;
+            }
+            request.setHeader("Content-Type", "application/json");
 
-        // 실제 API 호출 예시 (의사 코드):
-        // HttpResponse response = HttpClient.call(apiEndpoint, param);
-        // this.actualStatusCode = response.getStatusCode();
-
-        // 데모를 위해 임의 값 설정
-        // 여기서는 param에 따라 결과 코드를 달리한다 가정
-        if ("param400".equalsIgnoreCase(param)) {
-            this.actualStatusCode = 400;
-        } else if ("param404".equalsIgnoreCase(param)) {
-            this.actualStatusCode = 404;
-        } else {
-            this.actualStatusCode = 200; // 기본 200
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                this.actualStatusCode = response.getStatusLine().getStatusCode();
+                String responseBody = EntityUtils.toString(response.getEntity());
+                System.out.println("API 응답 상태 코드: " + actualStatusCode);
+                System.out.println("API 응답 본문: " + responseBody);
+            }
+        } catch (Exception e) {
+            System.err.println("API 호출 중 오류 발생: " + e.getMessage());
+            this.actualStatusCode = 500;
         }
     }
 
